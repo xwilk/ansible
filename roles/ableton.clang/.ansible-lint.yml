@@ -1,0 +1,8 @@
+---
+exclude_paths:
+  - .ansible/roles
+  - meta
+  - molecule
+parseable: true
+skip_list:
+  - "empty-string-compare"

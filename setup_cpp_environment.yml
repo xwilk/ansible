@@ -1,0 +1,8 @@
+---
+- name: Install clang on hosts
+  hosts: localhost
+
+  roles:
+    - role: ableton.clang
+      clang_versions:
+        - 14

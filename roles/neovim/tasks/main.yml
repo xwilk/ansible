@@ -1,0 +1,59 @@
+---
+- name: register nvim exists
+  ansible.builtin.stat:
+    path: /squashfs-root
+  register: nvim_installed
+  tags: [neovim]
+
+- name: install nvim
+  block:
+
+  - name: create directory for appimage installer
+    ansible.builtin.file:
+      name: ~/.neovim/
+      state: directory
+    tags: [neovim]
+
+  - name: get neovim appimage
+    ansible.builtin.get_url: 
+      url: https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+      dest: ~/.neovim/nvim.appimage
+      mode: u+x
+    tags: [neovim]
+
+  - name: extract neovim from appimage
+    ansible.builtin.shell: ~/.neovim/nvim.appimage --appimage-extract
+    tags: [neovim]
+
+  - name: mv squashfs-root to root dir
+    ansible.builtin.shell: "mv /home/{{ user }}/.neovim/squashfs-root /"
+    become: yes
+    tags: [neovim]
+
+  when: nvim_installed.stat.isdir is not defined or not nvim_installed.stat.isdir
+
+- name: expose nvim globally
+  ansible.builtin.file:
+    src: /squashfs-root/AppRun
+    dest: /usr/bin/nvim
+    state: link
+  become: yes
+  tags: [neovim]
+
+- name: Install packer.nvim
+  ansible.builtin.git:
+    repo: "https://github.com/wbthomason/packer.nvim"
+    dest: "{{ lookup('env', 'HOME') }}/.local/share/nvim/site/pack/packer/start/packer.nvim"
+    depth: 1
+  tags: [neovim]
+
+- name: remove configuration files
+  ansible.builtin.file:
+    name: ~/.config
+    state: absent
+  tags: [neovim]
+
+- name: stow zsh config files
+  ansible.builtin.shell: cd $HOME/.dotfiles && stow nvim
+  tags: [neovim]
+

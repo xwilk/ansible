@@ -1,0 +1,12 @@
+---
+- name: Setup shell environemt
+  hosts: localhost
+
+  roles:
+    - name: dotfiles
+    - name: ohmyzsh
+      user: "{{ ansible_user_id }}"
+    - name: neovim
+      user: "{{ ansible_user_id }}"
+    - name: fzf
+      

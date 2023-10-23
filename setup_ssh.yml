@@ -1,0 +1,10 @@
+---
+- name: Install ssh keys
+  hosts: localhost
+
+  roles:
+    - name: ssh
+      source_key: "./id_rsa"
+      dest_key: "{{ lookup('env', 'HOME') }}/.ssh/id_rsa"
+      user: "{{ lookup('env', 'USER') }}"
+

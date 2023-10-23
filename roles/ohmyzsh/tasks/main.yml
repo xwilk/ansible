@@ -1,0 +1,55 @@
+---
+- name: Ensure zsh is installed.
+  block:
+    - name: Install zsh for Linux.
+      package:
+        name: "zsh"
+        state: present
+      when:
+        - "ansible_system == 'Linux'"
+      become: yes
+
+    - name: Install zsh for macOS.
+      homebrew:
+        name: "zsh"
+        state: present
+      when:
+        - "ansible_system == 'Darwin'"
+      become: yes
+  tags: ['ohmyzsh']
+
+- name: Change shell to zsh
+  shell: chsh -s $(which zsh) "{{ user }}"
+  tags: ['ohmyzsh']
+  become: yes
+
+- name: Check if OhMyZsh is already installed
+  stat:
+    path: "~/.oh-my-zsh"
+  register: oh_my_stats
+  tags: ['ohmyzsh']
+
+- name: Install Oh-My-Zsh
+  shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  when: oh_my_stats.stat.exists == False
+  tags: ['ohmyzsh']
+
+- name: Install the zsh plugin auto-suggestions
+  ansible.builtin.git:
+    repo: "https://github.com/zsh-users/zsh-autosuggestions.git"
+    dest: "~/.oh-my-zsh/plugins/zsh-autosuggestions"
+  tags: ['ohmyzsh']
+
+- name: remove zsh config files
+  ansible.builtin.file:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - ~/.zshrc
+    - ~/.zsh_profile
+  tags: [ohmyzsh]
+
+- name: stow zsh config files
+  ansible.builtin.shell: cd $HOME/.dotfiles && stow zsh
+  tags: [ohmyzsh]
+
