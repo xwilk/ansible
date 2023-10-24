@@ -1,0 +1,12 @@
+---
+- name: install fzf
+  become: yes
+  ansible.builtin.package:
+    name: fzf
+  tags: [utils]
+
+- name: stow custom scripts from dotfiles
+  ansible.builtin.shell: cd $HOME/.dotfiles && stow bin
+  tags: [utils]
+
+
