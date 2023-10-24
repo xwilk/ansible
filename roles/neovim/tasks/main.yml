@@ -22,7 +22,9 @@
     tags: [neovim]
 
   - name: extract neovim from appimage
-    ansible.builtin.shell: ~/.neovim/nvim.appimage --appimage-extract
+    ansible.builtin.shell:
+      cmd: ~/.neovim/nvim.appimage --appimage-extract
+      chdir: ~/.neovim/
     tags: [neovim]
 
   - name: mv squashfs-root to root dir
