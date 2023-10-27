@@ -3,7 +3,7 @@
   become: yes
   ansible.builtin.package: 
     name: stow
-  tags: [dotfiles, ohmyzsh, neovim]
+  tags: [dotfiles, ohmyzsh, neovim, tmux]
 
 - name: Clone .dotfiles repo
   ansible.builtin.git:
@@ -14,5 +14,5 @@
     accept_hostkey: yes
     version: master
     key_file: /home/piwilk/.ssh/id_rsa
-  tags: [dotfiles, ohmyzsh, neovim]
+  tags: [dotfiles, ohmyzsh, neovim, tmux]
 
