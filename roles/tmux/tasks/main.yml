@@ -3,10 +3,15 @@
   become: yes
   ansible.builtin.package:
     name: fzf
-  tags: [utils]
+  tags: [tmux]
 
 - name: stow custom scripts from dotfiles
   ansible.builtin.shell: cd $HOME/.dotfiles && stow bin
-  tags: [utils]
+  tags: [tmux]
 
+- name: install tmux
+  become: yes
+  ansible.builtin.package:
+    name: tmux
+  tags: [tmux]
 
