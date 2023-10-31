@@ -15,3 +15,7 @@
     name: tmux
   tags: [tmux]
 
+- name: stow tmux config
+  ansible.builtin.shell: cd $HOME/.dotfiles && stow tmux
+  tags: [tmux]
+
