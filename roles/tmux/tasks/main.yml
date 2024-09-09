@@ -19,3 +19,14 @@
   ansible.builtin.shell: cd $HOME/.dotfiles && stow tmux
   tags: [tmux]
 
+- name: clone tpm
+  ansible.builtin.git:
+    repo: "https://github.com/tmux-plugins/tpm"
+    dest: "{{ lookup('env', 'HOME') }}/.tmux/plugins/tpm"
+    recursive: yes
+    update: yes
+    accept_hostkey: yes
+    version: master
+    key_file: /home/piwilk/.ssh/id_rsa
+  tags: [tmux]
+
