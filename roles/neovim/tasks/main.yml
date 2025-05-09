@@ -1,45 +1,35 @@
 ---
-- name: register nvim exists
-  ansible.builtin.stat:
-    path: /squashfs-root
-  register: nvim_installed
+- name: clone neovim repo
+  ansible.builtin.git:
+    repo: "https://github.com/neovim/neovim"
+    dest: "{{ lookup('env', 'HOME') }}/build/neovim"
+    depth: 1
   tags: [neovim]
 
-- name: install nvim
-  block:
-
-  - name: create directory for appimage installer
-    ansible.builtin.file:
-      name: ~/.neovim/
-      state: directory
-    tags: [neovim]
-
-  - name: get neovim appimage
-    ansible.builtin.get_url: 
-      url: https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-      dest: ~/.neovim/nvim.appimage
-      mode: u+x
-    tags: [neovim]
-
-  - name: extract neovim from appimage
-    ansible.builtin.shell:
-      cmd: ~/.neovim/nvim.appimage --appimage-extract
-      chdir: ~/.neovim/
-    tags: [neovim]
-
-  - name: mv squashfs-root to root dir
-    ansible.builtin.shell: "mv /home/{{ user }}/.neovim/squashfs-root /"
-    become: yes
-    tags: [neovim]
-
-  when: nvim_installed.stat.isdir is not defined or not nvim_installed.stat.isdir
-
-- name: expose nvim globally
-  ansible.builtin.file:
-    src: /squashfs-root/AppRun
-    dest: /usr/bin/nvim
-    state: link
+- name: Install ninja
   become: yes
+  ansible.builtin.package: 
+    name: ninja-build 
+  tags: [neovim]
+
+- name: Install cmake 
+  become: yes
+  ansible.builtin.package: 
+    name: cmake 
+  tags: [neovim]
+
+- name: make build neovim
+  community.general.make:
+    chdir: "{{ lookup('env', 'HOME') }}/build/neovim"
+    params:
+      CMAKE_BUILD_TYPE: RelWithDebInfo
+  tags: [neovim]
+
+- name: make install neovim
+  become: yes
+  community.general.make:
+    chdir: "{{ lookup('env', 'HOME') }}/build/neovim"
+    target: install
   tags: [neovim]
 
 - name: Install packer.nvim
